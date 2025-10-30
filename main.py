@@ -16,7 +16,7 @@ from src.tools import (
 )
 from src.utils import SAFE_BASE_DIR
 from src.prompts import system_prompt
-from config import agent_model
+from config import agent_model, max_iterations
 
 client = OpenAI()
 
@@ -68,54 +68,57 @@ def execute_tool(tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
 
 def process_conversation(messages: List[Dict[str, Any]]) -> str:
     """Process the conversation with OpenAI and handle tool calls"""
-    response = client.chat.completions.create(
-        model=agent_model,
-        messages=messages,
-        tools=tools_configuration,
-        tool_choice="auto"
-    )
+    max_iterations = max_iterations  
+    iteration = 0
     
-    assistant_message = response.choices[0].message
-    
-    message_dict = {
-        "role": "assistant",
-        "content": assistant_message.content
-    }
-    
-    if assistant_message.tool_calls:
-        message_dict["tool_calls"] = assistant_message.tool_calls
-    
-    messages.append(message_dict)
-    
-    if assistant_message.tool_calls:
-        for tool_call in assistant_message.tool_calls:
-            function_name = tool_call.function.name
-            function_args = json.loads(tool_call.function.arguments)
-            
-            tool_result = execute_tool(function_name, function_args)
-            
-            messages.append({
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": json.dumps(tool_result)
-            })
+    while iteration < max_iterations:
+        iteration += 1
         
-        final_response = client.chat.completions.create(
+        response = client.chat.completions.create(
             model=agent_model,
             messages=messages,
             tools=tools_configuration,
             tool_choice="auto"
         )
         
-        final_message = final_response.choices[0].message
-        messages.append({
-            "role": "assistant",
-            "content": final_message.content
-        })
+        assistant_message = response.choices[0].message
         
-        return final_message.content
+        message_dict = {
+            "role": "assistant",
+            "content": assistant_message.content
+        }
+        
+        if assistant_message.tool_calls:
+            message_dict["tool_calls"] = assistant_message.tool_calls
+        
+        messages.append(message_dict)
+        
+        # If there are tool calls, execute them all
+        if assistant_message.tool_calls:
+            print_colored(f"\n🔄 Executing {len(assistant_message.tool_calls)} tool call(s)...", Colors.YELLOW)
+            
+            # Execute all tool calls and collect results
+            for tool_call in assistant_message.tool_calls:
+                function_name = tool_call.function.name
+                function_args = json.loads(tool_call.function.arguments)
+                
+                tool_result = execute_tool(function_name, function_args)
+                
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": json.dumps(tool_result)
+                })
+            
+            # Continue the loop to allow the model to process all tool results
+            # and potentially make more tool calls or provide a final answer
+            continue
+        else:
+            # No tool calls, we have a final response
+            return assistant_message.content
     
-    return assistant_message.content
+    print_colored(f"\n⚠️  Reached maximum iterations ({max_iterations}). Returning last response.", Colors.YELLOW)
+    return assistant_message.content if assistant_message.content else "I apologize, but I couldn't complete the task within the iteration limit."
 
 def main():
     """Main interactive loop"""

@@ -144,6 +144,7 @@ def read_files_iterative(paths: List[str], chunk_size: int = DEFAULT_CHUNK_SIZE)
     results = []
     integrated_summaries = []
     for p in tqdm(paths, desc="Reading files"):
+        p = safe_path(p)
         try:
             r = read_file(p, max_chars=10000000) 
             if r.get("error"):
@@ -181,6 +182,7 @@ def search_in_files(query: str, paths: List[str], use_regex: bool = False, max_r
     matches = []
     pattern = re.compile(query, re.IGNORECASE) if use_regex else None
     for p in paths:
+        p = safe_path(p)
         try:
             r = read_file(p, max_chars=5_000_000)
             if r.get("error"):
