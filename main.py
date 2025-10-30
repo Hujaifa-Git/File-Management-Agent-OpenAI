@@ -16,7 +16,7 @@ from src.tools import (
 )
 from src.utils import SAFE_BASE_DIR
 from src.prompts import system_prompt
-from config import agent_model, max_iterations
+from config import agent_model, max_iteration
 
 client = OpenAI()
 
@@ -68,7 +68,7 @@ def execute_tool(tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
 
 def process_conversation(messages: List[Dict[str, Any]]) -> str:
     """Process the conversation with OpenAI and handle tool calls"""
-    max_iterations = max_iterations  
+    max_iterations = max_iteration
     iteration = 0
     
     while iteration < max_iterations:
