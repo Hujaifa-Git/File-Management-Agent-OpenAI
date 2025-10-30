@@ -109,6 +109,8 @@ You can change these to any available OpenAI model:
 ALLOWED_EXTENSIONS = {'.txt', '.md', '.csv', '.json', '.pdf', '.docx'}  # Supported file types
 MAX_FILE_READ_BYTES = 20 * 1024 * 1024  # Maximum file size (20 MB)
 DEFAULT_CHUNK_SIZE = 4000  # Characters per chunk for large files
+
+max_iterations = 5  # max number of iterations for the agent to process the user's request
 ```
 
 ## Usage
