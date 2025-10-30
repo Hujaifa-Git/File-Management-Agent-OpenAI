@@ -1,0 +1,6 @@
+ProductID,ProductName,Category,Price,StockQuantity
+P001,Wireless Mouse,Electronics,25.99,150
+P002,Ergonomic Keyboard,Electronics,75.00,80
+P003,Notebook (A5),Office Supplies,4.50,500
+P004,Eco-Laptop Stand,Accessories,45.99,200
+P005,Travel Mug,Kitchenware,19.95,120

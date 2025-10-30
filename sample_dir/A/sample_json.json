@@ -1,0 +1,18 @@
+{
+  "user": {
+    "id": 101,
+    "username": "coder_gem",
+    "email": "coder.gem@example.com",
+    "is_active": true,
+    "last_login": "2025-10-30T10:30:00Z",
+    "roles": [
+      "admin",
+      "developer"
+    ],
+    "settings": {
+      "theme": "dark",
+      "notifications_enabled": true
+    }
+  },
+  "api_version": "1.2"
+}
